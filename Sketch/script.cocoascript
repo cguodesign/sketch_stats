@@ -1,0 +1,98 @@
+// First, we’ll unselect everything
+var doc = context.document
+[[doc currentPage] deselectAllLayers]
+//log(context)
+
+var layerCount = 0
+var layerCounter = 0
+var groupCounter = 0
+var pixelCount = 0
+var layerSpecs = []
+var artboardsSpecs = []
+
+doc.currentPage().deselectAllLayers()
+
+function is_group(layer) {
+  return [layer isMemberOfClass:[MSLayerGroup class]] || [layer isMemberOfClass:[MSArtboardGroup class]]
+}
+
+function get_pixel_count(layer) {
+  return layer.frame().width() * layer.frame().height()
+}
+
+function get_specs_artboard(ab) {
+  entry = {}
+  entry.name = ab.name()
+  entry.width = ab.frame().width()
+  entry.height = ab.frame().height()
+  entry.layerPixel = ab.frame().width() * ab.frame().height()
+  artboardsSpecs.push(entry)
+}
+
+function get_specs(layer){
+  var entry = {}
+  entry.name = layer.name()
+  entry.width = layer.frame().width()
+  entry.height = layer.frame().height()
+  //log(layer.class())
+//todo: get all the objects in fills and borders
+  if (layer.class() == 'MSTextLayer'){
+    entry.fill = layer.textColor().hexValue().toString()
+    entry.fill = 'null'
+  }
+  if (layer.style().fills().count()>0){
+    entry.fill = layer.style().fills().firstObject().color().hexValue().toString()
+  }else{
+    entry.fill = 'null'
+  }
+  if (layer.style().borders().count() >0 ){
+    entry.stroke = layer.style().borders().firstObject().color().hexValue().toString()
+  }else{
+    entry,stroke = 'null'
+  }
+  
+  layerSpecs.push(entry)
+}
+
+function group_count(layers){
+  if (layers.length() > 0){
+    for(var i = 0; i<layers.length(); i++){
+      var layer = layers.objectAtIndex(i)
+      if(is_group(layer) == 1){
+        groupCounter += 1
+      }
+    }
+  }else{
+    groupCounter += 0
+  }
+  return groupCounter
+}
+
+function endless_ungrouping(layers){
+  layerCounter += layers.length()
+  group_count(layers)
+    for(var i = 0; i<layers.length(); i++){
+      var layer = layers.objectAtIndex(i)
+      if(is_group(layer) == 1){
+        endless_ungrouping(layer.layers())
+      }else{
+        get_specs(layer)
+        pixelCount += get_pixel_count(layer)
+     }
+  }
+}
+
+// Now, let’s iterate through all layers:
+var all_artboards = doc.currentPage().artboards()
+for(var a=0; a < all_artboards.length(); a++){
+  get_specs_artboard(all_artboards[a])
+  var all_layers = all_artboards[a].layers()
+  endless_ungrouping(all_layers)
+}
+
+layerCount = layerCounter - groupCounter
+
+log(layerCount)
+log(pixelCount)
+log(layerSpecs)
+log(artboardsSpecs)

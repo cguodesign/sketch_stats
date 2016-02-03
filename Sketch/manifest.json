@@ -1,0 +1,23 @@
+{
+  "author" : "Chester Guo",
+  "commands" : [
+    {
+      "script" : "script.cocoascript",
+      "handler" : "onRun",
+      "shortcut" : "",
+      "name" : "SketchStats",
+      "identifier" : "sketchstats"
+    }
+  ],
+  "menu" : {
+    "items" : [
+      "sketchstats"
+    ],
+    "title" : "SketchStats"
+  },
+  "identifier" : "com.example.sketch.bc490634-eb7d-417b-b5c2-660e978720c2",
+  "version" : "1.0",
+  "description" : "A library that allows sketch users to count all the layers, pixels and colors they made for the project",
+  "authorEmail" : "cguo.tju@gmail.com",
+  "name" : "SketchStats"
+}
